@@ -1,0 +1,13 @@
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Secrets (defensive; the pipeline itself needs no .env/API key)
+.env
+
