@@ -31,22 +31,29 @@ def _build_prompt(run_date: str) -> str:
     """Construct the report-writing prompt for the opencode agent."""
     return f"""You are a professional AI/LLM industry analyst. Write a concise, data-grounded trends/news-style report on current LLM pricing, in a professional tone suitable for publishing as a LinkedIn post. No slang, no emoji spam, no clickbait — use a clear, industry-analyst voice.
 
-GROUNDING RULE: Every figure you cite MUST come from the attached CSV file (llm_cost_index_{run_date}.csv). Do NOT invent, estimate, or guess any numbers that are not present in that data. If a claim cannot be supported by the CSV, omit it.
+GROUNDING RULE: Every figure you cite MUST come from the attached CSV files (llm_cost_index_{run_date}.csv and value_scores_{run_date}.csv). Do NOT invent, estimate, or guess any numbers that are not present in that data. If a claim cannot be supported by the data, omit it.
 
-The attached charts (chart_balanced_1_1.png, chart_standard_8_2.png, chart_coding_9_1.png) visualize the three blended-cost profiles described below.
+There are five attached charts, in this order:
+1. chart_value_score.png — the headline "winner" chart. Ranks models by intelligence-per-dollar: Value Score = 3 x Intelligence Index / (Balanced + Standard + Coding blended costs), normalized so the best intelligence-per-dollar model equals 100% and every other model keeps its true relative proportion. Backed by the value_scores_{run_date}.csv leaderboard, already sorted best choice first.
+2. chart_intelligence.png — ranks models by raw Artificial Analysis Intelligence Index alone (no cost factored in), so readers can see who wins purely on capability.
+3. chart_balanced_1_1.png, 4. chart_standard_8_2.png, 5. chart_coding_9_1.png — the three blended-cost-only profiles described in the methodology below (no intelligence overlay on these).
 
 REQUIRED STRUCTURE:
 1. A strong, professional headline.
 2. A short intro hook (2-3 sentences) framing why LLM pricing literacy matters.
-3. A methodology blurb (one paragraph) explaining the three blended-cost profiles:
-   - Balanced Profile (1:1): 50% input / 50% output tokens.
-   - Standard Text Profile (8:2): 80% input / 20% output tokens (RAG, chatbots, summarization).
-   - Coding Profile (9:1): 90% input / 10% output tokens (large codebases ingested as input, concise completions).
-   Blended Cost per 1M tokens = (Input Price per 1M * input %) + (Output Price per 1M * output %).
-4. A findings section for EACH profile: name the cheapest models, the most expensive models, and note notable price spreads or outliers, using real numbers from the CSV.
-5. A short closing takeaway (2-3 sentences).
+3. "The Winner" — lead with this, right after the hook and before any raw cost breakdown. State plainly which model has the best intelligence-per-dollar Value Score and why, using the value_scores CSV (top pick, runner-up, and the worst-value model, with real numbers). This is the takeaway a skimming reader should get even if they read nothing else.
+4. A methodology blurb (one paragraph) explaining the three blended-cost profiles, for readers who want the raw numbers behind the winner:
+    - Balanced Profile (1:1): 50% input / 50% output tokens.
+    - Standard Text Profile (8:2): 80% input / 20% output tokens (RAG, chatbots, summarization).
+    - Coding Profile (9:1): 90% input / 10% output tokens (large codebases ingested as input, concise completions).
+    Blended Cost per 1M tokens = (Input Price per 1M * input %) + (Output Price per 1M * output %).
+5. A findings section for EACH profile: name the cheapest models, the most expensive models, and note notable price spreads or outliers, using real numbers from the CSV.
+6. An "Intelligence Leaders" subsection naming the highest and lowest Intelligence Index models from the CSV, independent of cost.
+7. A short closing takeaway (2-3 sentences).
 
-EMBEDDING CHARTS: Reference the three charts using RELATIVE Markdown image links so the report renders from within its own folder:
+EMBEDDING CHARTS: Reference the charts using RELATIVE Markdown image links, in this order, so the report renders from within its own folder:
+- ![Value Score](assets/chart_value_score.png)
+- ![Intelligence Index](assets/chart_intelligence.png)
 - ![Balanced 1:1](assets/chart_balanced_1_1.png)
 - ![Standard 8:2](assets/chart_standard_8_2.png)
 - ![Coding 9:1](assets/chart_coding_9_1.png)
@@ -55,15 +62,18 @@ OUTPUT: Write your final report directly to report/{run_date}/README.md using yo
 
 
 def _required_files(run_date: str) -> List[Path]:
-    """Return the list of files the agent needs (CSV + 3 charts)."""
+    """Return the list of files the agent needs (2 CSVs + 5 charts)."""
     assets = report_dir(run_date) / "assets"
     csv = assets / f"llm_cost_index_{run_date}.csv"
+    value_csv = assets / f"value_scores_{run_date}.csv"
     charts = [
+        assets / "chart_value_score.png",
+        assets / "chart_intelligence.png",
         assets / "chart_balanced_1_1.png",
         assets / "chart_standard_8_2.png",
         assets / "chart_coding_9_1.png",
     ]
-    return [csv, *charts]
+    return [csv, value_csv, *charts]
 
 
 def generate(run_date: str, model: str) -> Path:

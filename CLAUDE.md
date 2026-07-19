@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A provider-agnostic pipeline that tracks OpenRouter LLM pricing, computes blended cost-per-1M-tokens under three workload profiles, charts it, and has an AI agent (`opencode`) write a LinkedIn-ready trends report from the results.
 
+## Public repo — no PII, secrets, or machine-identifying info
+
+This repo is public and open source. Nothing committed here — code, generated reports/CSVs/charts, commit messages, or this file — should contain:
+- Personal information (real names, emails, usernames) beyond what's already in the public git history/GitHub org.
+- API keys, tokens, or credentials of any kind (none are needed — OpenRouter's endpoint is public/unauthenticated, and opencode's own provider credentials live in the *host machine's* opencode config, never in this repo).
+- Local machine details: absolute filesystem paths (e.g. `/Users/<name>/...` or `/home/<name>/...`), hostnames, OS/environment specifics, or anything else that identifies the machine or account a run happened on.
+
+Before committing generated output (new `report/<date>/` folders, regenerated charts/CSVs), check it's clean of the above — e.g. `grep -rn "/Users/\|/home/"` over new/changed files, and a quick look at chart PNGs for embedded paths (rare with matplotlib, but check if something looks off). When writing scripts, never log or embed absolute local paths into files that get committed (`report/`-scoped relative paths are fine; full local filesystem paths are not).
+
 ## "Update the pricing for me"
 
 This is the single most common request in this repo. It means: run the full pipeline for today (or a given date) and produce a fresh `report/<date>/` folder.

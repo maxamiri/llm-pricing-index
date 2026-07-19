@@ -12,6 +12,12 @@ Raw per-token input/output prices are misleading on their own — production wor
 
 `Blended Cost per 1M tokens = (Input Price × input %) + (Output Price × output %)`
 
+On top of the three cost profiles, each run also computes a **Value Score** — intelligence per blended dollar — so the report can lead with "which model is the best deal" rather than just raw prices:
+
+`Value Score (raw) = 3 × Intelligence Index / (1:1 + 8:2 + 9:1 Blended Cost)`, normalized so the best intelligence-per-dollar model scores 100% and every other model keeps its true relative proportion.
+
+(Intelligence Index comes from OpenRouter's [Artificial Analysis](https://artificialanalysis.ai) benchmark field, where available.)
+
 ## Quickstart
 
 ```bash
@@ -35,7 +41,8 @@ Without `REPORT_MODEL`/`--model`, the pipeline still runs Stages 1–2 (fresh da
 ```
 Stage 1  scripts/fetch_data.py        → report/<date>/assets/raw_model_data.csv
 Stage 2  scripts/process_and_plot.py  → report/<date>/assets/llm_cost_index_<date>.csv
-                                       → report/<date>/assets/chart_{balanced_1_1,standard_8_2,coding_9_1}.png
+                                       → report/<date>/assets/value_scores_<date>.csv
+                                       → report/<date>/assets/chart_{value_score,intelligence,balanced_1_1,standard_8_2,coding_9_1}.png
 Stage 3  scripts/generate_report.py   → report/<date>/README.md
 ```
 
@@ -44,7 +51,8 @@ Each stage is independently re-runnable with `--date YYYY-MM-DD`. See [`CLAUDE.m
 ## Reports
 
 <!-- REPORTS:START -->
-- [2026-07-18](report/2026-07-18/README.md) _(latest)_
+- [2026-07-19](report/2026-07-19/README.md) _(latest)_
+- [2026-07-18](report/2026-07-18/README.md)
 <!-- REPORTS:END -->
 
 ## License
